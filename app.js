@@ -1,15 +1,15 @@
 const express = require('express');
 const dotenv = require('dotenv').config();
 const app = express();
+const MongoClient = require('mongodb').MongoClient;
 const port = 5000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-let db;
+var db;
 
-const MongoClient = require('mongodb').MongoClient;
-MongoClient.connect(`${process.env.DB_URL}`, (err, client) => {
+MongoClient.connect(`${process.env.DB_URL}`, { useUnifiedTopology: true }, (err, client) => {
     if(err) throw err;
 
     db = client.db('GGouiGGoui');
@@ -37,20 +37,15 @@ app.get('/', (req, res) => {
         ]
     }
     console.log(data);
-    // console.log('시발', JSON.parse(test));
-    // console.log(JSON.parse(data))
     res.header("Access-Control-Allow-Origin", "*"); // 리액트 해야됨
     res.send(data);
 })
 
-app.post('/write', (req, res) => {
-    console.log(req.body)
-    const name = req.body.name;
-    const title = req.body.img;
-    const content = req.body.author;
-    const datas = [name, title, content];
-
-    const sql = 'INSERT INTO board(name, title, content'
+app.get('/add', (req, res) => {
+    res.send('응답 완료');
+    db.collection('post').insertOne({날짜 : '2021-09-27', 이름 : '전승원'}, (err, results) => {
+        console.log('저장완료됨')
+    })
 })
 
 
