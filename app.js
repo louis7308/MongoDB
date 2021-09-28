@@ -7,6 +7,8 @@ const port = 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+app.set('view engine', 'ejs');
+
 var db;
 
 MongoClient.connect(`${process.env.DB_URL}`, { useUnifiedTopology: true }, (err, client) => {
@@ -41,12 +43,20 @@ app.get('/', (req, res) => {
     res.send(data);
 })
 
-app.get('/add', (req, res) => {
+app.post('/add', (req, res) => {
     res.send('응답 완료');
     db.collection('post').insertOne({날짜 : '2021-09-27', 이름 : '전승원'}, (err, results) => {
         console.log('저장완료됨')
     })
 })
+
+app.get('/list', (req, res) => {
+    console.log(db.collection('post').find().toArray());
+
+    res.render('index.ejs');
+})
+
+
 
 
 app.listen(port, () => {
