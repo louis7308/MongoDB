@@ -2,10 +2,26 @@ const express = require('express');
 const dotenv = require('dotenv').config();
 const app = express();
 const MongoClient = require('mongodb').MongoClient;
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
+const board_router = require('./routers/board');
+const rootRouter = require('./routers/rootrouter')
 const port = 5000;
 
+app.use(session({
+    secret: 'suaw3211',
+    resave: true,
+    saveUnintialized: false
+}))
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use('/', rootRouter);
+app.use('/shop', require('./routers/shop.js'));
+app.use('/board', board_router);
 
 app.set('view engine', 'ejs');
 
@@ -19,44 +35,6 @@ MongoClient.connect(`${process.env.DB_URL}`, { useUnifiedTopology: true }, (err,
         console.log('저장완료');
     })
 })
-
-app.get('/', (req, res) => {
-    const data = {
-        "works": [
-            {
-                    "img": "https://asdadsads.s3.ap-northeast-2.amazonaws.com/1.jpg",
-                    "name": "이름",
-                    "author": "작가",
-                    "like": 123
-            },
-            {
-
-                    "img": "https://asdadsads.s3.ap-northeast-2.amazonaws.com/1.jpg",
-                    "name": "이름",
-                    "author": "작가",
-                    "like": 123
-            }
-        ]
-    }
-    console.log(data);
-    res.header("Access-Control-Allow-Origin", "*"); // 리액트 해야됨
-    res.send(data);
-})
-
-app.post('/add', (req, res) => {
-    res.send('응답 완료');
-    db.collection('post').insertOne({날짜 : '2021-09-27', 이름 : '전승원'}, (err, results) => {
-        console.log('저장완료됨')
-    })
-})
-
-app.get('/list', (req, res) => {
-    console.log(db.collection('post').find().toArray());
-
-    res.render('index.ejs');
-})
-
-
 
 
 app.listen(port, () => {
